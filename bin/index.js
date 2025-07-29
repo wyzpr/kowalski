@@ -70,7 +70,11 @@ program
     .description("Kowalski, analysis.")
     .option("-n, --name <type>", "Add your name")
     .action((options) => {
-        console.log(`Hey, ${options.name}!`);
+        console.log(chalk.bgGreen(`Hey, ${options.name}!`));
     });
 
+program
+    .command('analyze <stockName>')
+    .action()
 program.parse(process.argv);
+

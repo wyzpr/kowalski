@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "kowalski": "/index.js"
+    "kowalski": "./bin/index.js"
   },
   "type": "module",
   "bugs": {
