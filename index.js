@@ -5,6 +5,7 @@ import gradient from 'gradient-string';
 import chalkAnimation from 'chalk-animation';
 import figlet from 'figlet';
 import { createSpinner } from 'nanospinner';
+import { program } from 'commander';
 
 let playerName;
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)); //Function to sleep for given time
@@ -60,6 +61,16 @@ async function q1() {
 
 
 
-await delt3Intro();
+/*await delt3Intro();
 await askName();
-await q1();
+await q1();*/
+
+program
+    .version("1.0.0")
+    .description("Kowalski, analysis.")
+    .option("-n, --name <type>", "Add your name")
+    .action((options) => {
+        console.log(`Hey, ${options.name}!`);
+    });
+
+program.parse(process.argv);
