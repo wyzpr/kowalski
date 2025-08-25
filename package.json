@@ -26,13 +26,10 @@
     "chalk-animation": "^2.0.3",
     "cheerio": "^1.1.2",
     "commander": "^14.0.0",
+    "express": "^5.1.0",
     "figlet": "^1.8.2",
     "gradient-string": "^3.0.0",
     "inquirer": "^12.8.2",
     "nanospinner": "^1.2.2"
-  },
-  "devDependencies": {
-    "@types/node": "^24.1.0",
-    "typescript": "^5.8.3"
   }
 }
