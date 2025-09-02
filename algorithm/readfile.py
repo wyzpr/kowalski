@@ -1,6 +1,6 @@
-import pandas as pd
 from docx import Document
 from pypdf import PdfReader
+import os
 
 filePath = input("Enter the file path: ")
 
@@ -46,6 +46,15 @@ def readPDF(pdf_path):
         full_text.append(page.extract_text())
     return '\n'.join(full_text)
 
+if os.path.exists(filePath) == False:
+    print("File does not exist. Please provide a valid file path.")
+    exit()
 
-print("Extracting text from the document...")
-print(readDoc(filePath))
+if '.docx' in filePath:
+    content = readDoc(filePath)
+    print(content)
+elif '.pdf' in filePath:
+    content = readPDF(filePath)
+    print(content)
+else:
+    print("Unsupported file format. Please provide a .docx or .pdf file.")
