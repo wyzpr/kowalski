@@ -3,13 +3,13 @@ import { getFirestore } from "firebase-admin/firestore";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
-const serviceAccount = JSON.parse(readFileSync(resolve('./firestore_key.json')));
+const serviceAccount = JSON.parse(readFileSync(resolve('./project_tools/firestore_key.json')));
 
 initializeApp({
   credential: cert(serviceAccount),
 });
 
-const raw = readFileSync('data/Resumes.json', 'utf8');
+const raw = readFileSync('data/BasicDataset.json', 'utf8');
 const data = raw.trim().split('\n').filter(line => line.length > 0).map(line => JSON.parse(line));
 console.log(data);
 
