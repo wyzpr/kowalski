@@ -1,1 +1,6 @@
 .env
+firestore_key.json
+__pycache__/
+*.pyc
+data/
+node_modules/
