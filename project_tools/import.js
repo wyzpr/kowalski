@@ -1,7 +1,9 @@
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { createReadStream } from "fs";
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { createInterface } from "readline";
 
 const serviceAccount = JSON.parse(readFileSync(resolve('./project_tools/firestore_key.json')));
 
@@ -9,39 +11,34 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 
-const raw = readFileSync('data/BasicDataset.json', 'utf8');
-const data = raw.trim().split('\n').filter(line => line.length > 0).map(line => JSON.parse(line));
-console.log(data);
+async function readJsonLines() {
+  const data = [];
+  const fileStream = createReadStream('data/skills/job_skills.json');
+  const rl = createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  });
+
+  for await (const line of rl) {
+    if (line.trim()) {
+      data.push(JSON.parse(line));
+    }
+  }
+  return data;
+}
 
 class sendToFirestore {
-  constructor(data) {
+  constructor(data, collectionname) {
     console.time('Upload Time');
     this.db = getFirestore();
-    const [, , filepath, type, collectionname] = process.argv;
     this.data = data;
-
-    this.absolutepath = resolve(filepath);
-    this.type = type;
     this.collectionname = collectionname;
-
-    if (this.type !== 'set' && this.type !== 'add') {
-        console.error(`Wrong method type ${this.type}`)
-        console.log('Use "set" or "add"');
-        this.exit(1);
-    }
-
-    if (this.absolutepath == null || this.absolutepath.length === 0) {
-        console.error('File path not provided');
-        this.exit(1);
-    }
 
     if (this.collectionname == null || this.collectionname.length === 0) {
         console.error('Firestore collection name not provided');
         this.exit(1);
     }
 
-    console.log(`ABS: FILE PATH ${this.absolutepath}`);
-    console.log(`TYPE: ${this.type}`);
     console.log(`COLLECTION: ${this.collectionname}`);
   }
 
@@ -52,7 +49,7 @@ class sendToFirestore {
     for (const item of this.data) {
         console.log(item);
         try {
-            this.type === 'set' ? await this.set(item) : await this.add(item);
+            await this.add(item);
         } catch (error) {
             console.error('Error adding document: ', error);
             this.exit(1);
@@ -76,17 +73,16 @@ class sendToFirestore {
     .catch((error) => console.error('Error adding document: ', error));
   }
 
-  async set(item) {
-    console.log(`Setting document with id ${item.id} to ${this.collectionname}`);
-    return this.db.doc(`${this.collectionname}/${item.id}`).set(Object.assign({}, item))
-    .then(() => true)
-    .catch((error) => console.error('Error setting document: ', error));
-  }
-
   exit(code) {
     return process.exit(code);
   }
 }
 
-const firestore = new sendToFirestore(data);
-firestore.populate();
+// Read the data and start the upload
+readJsonLines().then(data => {
+  const firestore = new sendToFirestore(data, 'JobSkills');
+  firestore.populate();
+}).catch(error => {
+  console.error('Error reading file:', error);
+  process.exit(1);
+});

@@ -1,8 +1,7 @@
 from docx import Document
 from pypdf import PdfReader
+from langchain.tools import Tool
 import os
-
-filePath = input("Enter the file path: ")
 
 def readDoc(docx_path):
     """
@@ -46,15 +45,23 @@ def readPDF(pdf_path):
         full_text.append(page.extract_text())
     return '\n'.join(full_text)
 
-if os.path.exists(filePath) == False:
-    print("File does not exist. Please provide a valid file path.")
-    exit()
 
-if '.docx' in filePath:
-    content = readDoc(filePath)
-    print(content)
-elif '.pdf' in filePath:
-    content = readPDF(filePath)
-    print(content)
-else:
-    print("Unsupported file format. Please provide a .docx or .pdf file.")
+def readFile(filePath):
+    if os.path.exists(filePath) == False:
+        print("File does not exist. Please provide a valid file path.")
+        exit()
+
+    if '.docx' in filePath:
+        content = readDoc(filePath)
+    elif '.pdf' in filePath:
+        content = readPDF(filePath)
+    else:
+        print("Unsupported file format. Please provide a .docx or .pdf file.")
+        exit()
+    return content
+
+read_file = Tool(
+    name="read_file",
+    func=readFile,
+    description="Returns the text content of a .docx or .pdf file given its file path. Use this tool to extract text from CV files.",
+)
